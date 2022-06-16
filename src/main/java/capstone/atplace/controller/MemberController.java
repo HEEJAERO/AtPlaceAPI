@@ -4,6 +4,7 @@ import capstone.atplace.domain.Member;
 import capstone.atplace.domain.Place;
 import capstone.atplace.form.JoinForm;
 import capstone.atplace.form.LoginForm;
+import capstone.atplace.response.Result;
 import capstone.atplace.service.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -67,60 +68,12 @@ public class MemberController {
 
     @GetMapping("/recommend")
     public String recommend() {
+
         return "recommend";
     }
 
-    // 즐겨찾기 목록 가져오기
-    @GetMapping("/places")
-    public Result places(@Valid @RequestParam String username) {
-        Long findMemberId = memberService.findByUsername(username);
 
-        List<Place> places = memberService.getPlaces(findMemberId);
 
-        return new Result(places.size(), places);
-
-    }
-    // 즐겨찾기 추가
-    @PostMapping("/add-place")
-    public void addPlace(){
-
-    }
-    // 즐겨찾기 변경
-    @PostMapping("/update-palce")
-    public void updatePlace(){
-
-    }
-    // 즐겨찾기 삭제
-
-    // 예약 목록 가져오기
-    @GetMapping("/meetings")
-    public void meetingList(){
-
-    }
-
-    // 예약 추가
-    @PostMapping("/add-meeting")
-    public void addMeeting(){
-
-    }
-    //예약 변경
-    @PostMapping("/update-meeting")
-    public void updateMeeting(){
-
-    }
-    //예약 삭제
-    @PostMapping("/delete-meeting")
-    public void deleteMeeting(){
-
-    }
     // 반환타입을 오브젝트로 반환
-
-    @Data
-    @AllArgsConstructor
-    static class Result<T>{
-        private int count;
-        private  T data;
-    }
-
 
 }

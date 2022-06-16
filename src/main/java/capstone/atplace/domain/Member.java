@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -35,6 +36,8 @@ public class Member {
     private String name;
 
     private String phoneNumber;
+
+    private String token;
     @JsonIgnore
     @OneToMany(mappedBy = "member")
     private List<Meeting> meetings = new ArrayList<>();
@@ -46,11 +49,13 @@ public class Member {
 
 
     public Member(String name, String password, String username, String phoneNumber, LocalDateTime now) {
+
         this.name = name;
         this.password = password;
         this.username = username;
         this.phoneNumber = phoneNumber;
         this.createDate = now;
+        this.token = UUID.randomUUID().toString();   // 이후 접근할때 토큰으로 사용
     }
 
     public void addPlace(Place place) {

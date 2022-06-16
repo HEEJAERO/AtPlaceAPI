@@ -5,7 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 ## 개인정보 ##
-!**/src/main/**/PrivateInfo
+/Users/heejae/Desktop/캡스톤/atplace/src/main/java/capstone/atplace/PrivateInfo.java
 
 ### STS ###
 .apt_generated

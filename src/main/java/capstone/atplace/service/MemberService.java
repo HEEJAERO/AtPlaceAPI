@@ -53,7 +53,9 @@ public class MemberService {
         }*/
         return placesByMember;
     }
-
+    public Member getMemberByToken(String token){
+        return memberRepository.findMemberByToken(token);
+    }
     // 모임 예약
     public List<Meeting> getMeetings(Member member) {
         Optional<Member> findMember = memberRepository.findById(member.getId());
