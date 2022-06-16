@@ -35,12 +35,12 @@ public class MemberService {
         return memberRepository.save(member).getId();
     }
     // 로그인
-    public Long login(String username, String password) {
+    public String login(String username, String password) {
         Member findMember = memberRepository.findByUsernameAndPassword(username, password);
         if (findMember == null) {
             throw new IllegalStateException("존재하지 않는 회원입니다. 회원가입부터 해주세요");
         }
-        return findMember.getId();
+        return findMember.getToken();
     }
     // 즐겨찾기
     public List<Place> getPlaces(Long memberId){

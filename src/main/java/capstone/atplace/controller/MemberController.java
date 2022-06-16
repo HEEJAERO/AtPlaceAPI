@@ -30,47 +30,35 @@ public class MemberController {
     private final MemberService memberService;
 
     // 회원가입 요청
-    @PostMapping("/member/new")
-    public String create(@Valid @ModelAttribute JoinForm form) {
+    @PostMapping("/join")
+    public Result create(@Valid @ModelAttribute JoinForm form) {
         // memberForm 추가
         Member member = new Member(form.getName(), form.getPassword(),
                 form.getUsername(), form.getPhoneNumber(), LocalDateTime.now());
         try {
             memberService.join(member);
         } catch (Exception e) {
-            return e.getMessage();
+            return new Result(false,e.getMessage());
         }
-        return "";
+        return new Result(true, member);
     }
 
     //로그인 요청
     @PostMapping("/login")
-    public String login(@Valid @ModelAttribute LoginForm form) {
+    public Result login(@Valid @ModelAttribute LoginForm form) {
         try {
-            memberService.login(form.getUsername(), form.getPassword());
+            String token = memberService.login(form.getUsername(), form.getPassword());
+            return new Result(true, token);
         } catch (Exception e) {
-            return e.getMessage();
+            return new Result(false,e.getMessage());
         }
-        return "login";
     }
-
     //로그아웃
     @PostMapping("/logout")
     public void logout(HttpServletResponse response) {
 
     }
 
-    private void expiredCookie(HttpServletResponse response, String cookieName) {
-        Cookie cookie = new Cookie(cookieName, null);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-    }
-
-    @GetMapping("/recommend")
-    public String recommend() {
-
-        return "recommend";
-    }
 
 
 

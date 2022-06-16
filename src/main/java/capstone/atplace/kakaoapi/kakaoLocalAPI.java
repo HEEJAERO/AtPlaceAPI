@@ -22,13 +22,13 @@ public class kakaoLocalAPI {
         String[] longitudes = {"127.423084873712", "127.423084873712", "127.423084873712", "127.423084873712"};
         String[] latitudes = {"37.0789561558879", "37.0789561558879", "37.0789561558879"};
         //System.out.println(getAddressInfoByAddress("경기도 군포시 금산로91 123동 1001호"));
-        System.out.println(getAddressInfoByCoordinate(findMidPoint(longitudes, latitudes)));
-        System.out.println(findMidPoint(longitudes, latitudes));
+       // System.out.println(getAddressInfoByCoordinate(findMidPoint(longitudes, latitudes)));
+        //System.out.println(findMidPoint(longitudes, latitudes));
     }
 
 
     // 주소로 주소정보 불러오기
-    public static String getAddressInfoByAddress(String addressStr) {
+    public String getAddressInfoByAddress(String addressStr) {
         String addressInfo = new String();
         URL obj;
         try {
@@ -54,7 +54,7 @@ public class kakaoLocalAPI {
         return addressInfo;
     }
     // 좌표로 주소 정보 불러오기
-    public static String getAddressInfoByCoordinate(String coordinate) {
+    public String getAddressInfoByCoordinate(String coordinate) {
         String[] s = coordinate.split(" ");
         String x = s[0];
         String y = s[1];
@@ -69,7 +69,7 @@ public class kakaoLocalAPI {
         return addressInfo;
     }
     //카테고리로 장소 검색
-    public static String getPlaceByCategory(String category){
+    public String getPlaceByCategory(String category){
         String addressInfo = new String();
         URL obj;
         //검색할 범위 ->반경 몇m?
@@ -87,7 +87,7 @@ public class kakaoLocalAPI {
         return addressInfo;
     }
     //kakaoAPI 에서 제공하는 형식에 맞는 쿼리의 형태로 url을 만드는 메소드
-    private static String requestToKakaoApi(URL obj) throws IOException {
+    private String requestToKakaoApi(URL obj) throws IOException {
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         //get으로 받아오면 된다. 자세한 사항은 카카오개발자센터에 나와있다.
         con.setRequestMethod("GET");
@@ -110,7 +110,7 @@ public class kakaoLocalAPI {
     }
 
     //중간 좌표 찾기 -> 입력받은 좌표들로 중간좌표 찾기
-    public static String findMidPoint(String[] longitudes, String[] latitudes) {
+    public String findMidPoint(String[] longitudes, String[] latitudes) {
 
         double x = 0f;
         double y = 0f;
