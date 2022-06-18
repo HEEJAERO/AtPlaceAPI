@@ -1,9 +1,10 @@
 package capstone.atplace.kakaoapi;
 
 import capstone.atplace.PrivateInfo;
-import org.json.simple.JSONArray;
+import lombok.AllArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,23 +13,26 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.List;
 
-public class kakaoLocalAPI {
+@AllArgsConstructor
+@Service
+public class KakaoLocalAPI {
     static PrivateInfo info = new PrivateInfo();
     private static String API_URL =info.getAPI_URL();
     private static String API_KEY = info.getAPI_KEY();
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         String[] longitudes = {"127.423084873712", "127.423084873712", "127.423084873712", "127.423084873712"};
         String[] latitudes = {"37.0789561558879", "37.0789561558879", "37.0789561558879"};
         //System.out.println(getAddressInfoByAddress("경기도 군포시 금산로91 123동 1001호"));
        // System.out.println(getAddressInfoByCoordinate(findMidPoint(longitudes, latitudes)));
         //System.out.println(findMidPoint(longitudes, latitudes));
-    }
+    }*/
 
 
     // 주소로 주소정보 불러오기
-    public String getAddressInfoByAddress(String addressStr) {
+    public JSONObject getAddressInfoByAddress(String addressStr) {
         String addressInfo = new String();
         URL obj;
         try {
@@ -48,13 +52,14 @@ public class kakaoLocalAPI {
                 JSONObject object = (JSONObject) jsonArray.get(i);
                 System.out.println(object.get("address"));
             }*/
+            System.out.println("addressInfo = " + addressInfo);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return addressInfo;
+        return stringToJson(addressInfo);
     }
     // 좌표로 주소 정보 불러오기
-    public String getAddressInfoByCoordinate(String coordinate) {
+    public JSONObject getAddressInfoByCoordinate(String coordinate) {
         String[] s = coordinate.split(" ");
         String x = s[0];
         String y = s[1];
@@ -66,26 +71,54 @@ public class kakaoLocalAPI {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return addressInfo;
+        return stringToJson(addressInfo);
     }
     //카테고리로 장소 검색
-    public String getPlaceByCategory(String category){
+    public JSONObject getPlaceByCategory(String category)  {
         String addressInfo = new String();
         URL obj;
         //검색할 범위 ->반경 몇m?
         int radius = 2000;
         // 이후 추가할 부분: 사용자가 입력한 카테고리를 카카오에서 제공하는 카테고리 코드와 매칭하여 적절한 결과가 나오도록 추가
         // 검색결과 나오지 않으면 radius 를 증가시켜 결과값이 최소 1개 이상 나오도록 설정
+        //카테고리 태그
+        //FD6	음식점
+        //CE7	카페
+        //AT4	관광명소
+        String tag = new String ();
+        if(category.equals("데이트")){
+            tag = "CE&";
+        }else if(category.equals("미팅")){
+            tag = "FD6";
+        }else if(category.equals("여행")){
+            tag = "AT4";
+        }
         try {
             //인코딩한 String을 넘겨야 원하는 데이터를 받을 수 있다.
             obj = new URL("https://dapi.kakao.com/v2/local/search/category.json?category_group_code="
-                    + category + "&radius="+ radius);
+                    + tag + "&radius="+ radius);
+            addressInfo = requestToKakaoApi(obj);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stringToJson(addressInfo);
+    }
+    public JSONObject getCoordinateByAddress(String address){
+        URL obj;
+        String addressInfo = new String();
+        try {
+            obj = new URL( "https://dapi.kakao.com/v2/local/search/address.json?query="+address);
             addressInfo = requestToKakaoApi(obj);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return addressInfo;
+        JSONObject jsonObject = stringToJson(addressInfo);
+        Object documents = jsonObject.get("documents");
+        return (JSONObject) documents;
     }
+
+
     //kakaoAPI 에서 제공하는 형식에 맞는 쿼리의 형태로 url을 만드는 메소드
     private String requestToKakaoApi(URL obj) throws IOException {
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -108,9 +141,8 @@ public class kakaoLocalAPI {
         String addressInfo = response.toString();
         return addressInfo;
     }
-
     //중간 좌표 찾기 -> 입력받은 좌표들로 중간좌표 찾기
-    public String findMidPoint(String[] longitudes, String[] latitudes) {
+    public String findMidPoint(List<String> longitudes, List<String> latitudes) {
 
         double x = 0f;
         double y = 0f;
@@ -118,15 +150,28 @@ public class kakaoLocalAPI {
         for (String longitude : longitudes) {
             x += Double.parseDouble(longitude);
             System.out.println(x);
-
         }
-        x /= longitudes.length;
+        x /= longitudes.size();
         for (String latitude : latitudes) {
             y += Double.parseDouble(latitude);
             System.out.println(y);
         }
-        y /= latitudes.length;
+        y /= latitudes.size();
 
         return String.format("%.12f", x) + " " + String.format("%.12f",y);
+    }
+    //String to Json
+    public JSONObject stringToJson(String addressInfo) {
+        JSONParser jsonParser = new JSONParser();
+        try {
+            Object parse = jsonParser.parse(addressInfo);
+            return (JSONObject) parse;
+        } catch (Exception e) {
+            System.out.println("e.getMessage() = " + e.getMessage());
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("success", false);
+            jsonObject.put("data", "데이터형식이 잘못되었습니다");
+            return jsonObject;
+        }
     }
 }
