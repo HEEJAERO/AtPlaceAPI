@@ -31,16 +31,16 @@ public class MemberService {
     //회원가입
     public Long join(Member member) {
         duplicateName(member);
-        duplicateUsername(member);
+        duplicateUsername(member.getUsername());
         return memberRepository.save(member).getId();
     }
     // 로그인
-    public String login(String username, String password) {
+    public Member login(String username, String password) {
         Member findMember = memberRepository.findByUsernameAndPassword(username, password);
         if (findMember == null) {
             throw new IllegalStateException("존재하지 않는 회원입니다. 회원가입부터 해주세요");
         }
-        return findMember.getToken();
+        return findMember;
     }
     // 즐겨찾기
     public List<Place> getPlaces(Long memberId){
@@ -72,11 +72,12 @@ public class MemberService {
         }
 
     }
-    public void duplicateUsername(Member member) {
-        Member findMember = memberRepository.findByUsername(member.getUsername());
+    public boolean duplicateUsername(String username) {
+        Member findMember = memberRepository.findByUsername(username);
         if (findMember!=null) {
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
         }
+        return true;
     }
 
 }

@@ -46,8 +46,12 @@ public class Member {
     private List<Place> places = new ArrayList<>();
 
 
-
-
+    public Member(String username,String password, String name){
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        this.token = UUID.randomUUID().toString();
+    }
     public Member(String name, String password, String username, String phoneNumber, LocalDateTime now) {
 
         this.name = name;

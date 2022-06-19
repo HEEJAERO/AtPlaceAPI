@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class kakaoApiController {
     private final KakaoLocalAPI kakaoLocalAPI;
-    @GetMapping("/recommend")
+    @GetMapping("/address")
     public Result recommend(@ModelAttribute CoordinateForm coordinateForm) {
         JSONObject addressinfo = kakaoLocalAPI.getAddressInfoByCoordinate(coordinateForm.getX() + " " + coordinateForm.getY());
         return new Result(true,addressinfo);
@@ -37,8 +37,8 @@ public class kakaoApiController {
         coordinate.put("y",b);
         return new Result(true, coordinate);
     }
-    @GetMapping("/address")
-    public Result getAddressByCoordinate(@RequestParam List<String> addresses) {
+    @GetMapping("/addresses")
+    public Result getCoordinateByAddresses(@RequestParam List<String> addresses) {
         //JSONObject coordinateByAddress = kakaoLocalAPI.getCoordinateByAddress(address);
         Double sumX = Double.valueOf(0);
         Double sumY = Double.valueOf(0);
@@ -58,6 +58,16 @@ public class kakaoApiController {
         coordinate.put("x",sumX/addresses.size());
         coordinate.put("y",sumY/addresses.size());
         return new Result(true,coordinate );
+    }
+    @GetMapping("/searching")
+    public Result getPlacesBySearching(@RequestParam String keyword){
+        JSONObject placeByKeyword = kakaoLocalAPI.getPlaceByKeyword(keyword);
+        return new Result(true, placeByKeyword);
+    }
+    @GetMapping("/recommend")
+    public Result getCoordinateByLocations(@RequestParam String category, @RequestParam String x,@RequestParam String y){
+        JSONObject placeByCategory = kakaoLocalAPI.getPlaceByCategory(category, x, y);
+        return new Result(true,placeByCategory);
     }
 
 }

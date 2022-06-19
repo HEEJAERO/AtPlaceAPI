@@ -74,7 +74,7 @@ public class KakaoLocalAPI {
         return stringToJson(addressInfo);
     }
     //카테고리로 장소 검색
-    public JSONObject getPlaceByCategory(String category)  {
+    public JSONObject getPlaceByCategory(String category,String x,String y)  {
         String addressInfo = new String();
         URL obj;
         //검색할 범위 ->반경 몇m?
@@ -87,7 +87,7 @@ public class KakaoLocalAPI {
         //AT4	관광명소
         String tag = new String ();
         if(category.equals("데이트")){
-            tag = "CE&";
+            tag = "CE7";
         }else if(category.equals("미팅")){
             tag = "FD6";
         }else if(category.equals("여행")){
@@ -95,8 +95,8 @@ public class KakaoLocalAPI {
         }
         try {
             //인코딩한 String을 넘겨야 원하는 데이터를 받을 수 있다.
-            obj = new URL("https://dapi.kakao.com/v2/local/search/category.json?category_group_code="
-                    + tag + "&radius="+ radius);
+            obj = new URL("https://dapi.kakao.com/v2/local/search/category.json?"
+                    +"y="+y+"&x="+x+"&category_group_code=" +tag + "&radius="+ radius);
             addressInfo = requestToKakaoApi(obj);
 
         } catch (Exception e) {
@@ -104,20 +104,23 @@ public class KakaoLocalAPI {
         }
         return stringToJson(addressInfo);
     }
-    public JSONObject getCoordinateByAddress(String address){
-        URL obj;
+    public JSONObject getPlaceByKeyword(String keyword) {
         String addressInfo = new String();
+        URL obj;
         try {
-            obj = new URL( "https://dapi.kakao.com/v2/local/search/address.json?query="+address);
+            //인코딩한 String을 넘겨야 원하는 데이터를 받을 수 있다.
+            String address = URLEncoder.encode(keyword, "UTF-8");
+            
+            obj = new URL("https://dapi.kakao.com/v2/local/search/keyword.json?query=" + address);
+            System.out.println("keyword = " + keyword);
             addressInfo = requestToKakaoApi(obj);
+
+            System.out.println("addressInfo = " + addressInfo);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        JSONObject jsonObject = stringToJson(addressInfo);
-        Object documents = jsonObject.get("documents");
-        return (JSONObject) documents;
+        return stringToJson(addressInfo);
     }
-
 
     //kakaoAPI 에서 제공하는 형식에 맞는 쿼리의 형태로 url을 만드는 메소드
     private String requestToKakaoApi(URL obj) throws IOException {

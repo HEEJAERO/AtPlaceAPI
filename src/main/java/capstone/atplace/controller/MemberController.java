@@ -33,8 +33,7 @@ public class MemberController {
     @PostMapping("/join")
     public Result create(@Valid @ModelAttribute JoinForm form) {
         // memberForm 추가
-        Member member = new Member(form.getName(), form.getPassword(),
-                form.getUsername(), form.getPhoneNumber(), LocalDateTime.now());
+        Member member = new Member(form.getUsername(), form.getPassword(), form.getName());
         try {
             memberService.join(member);
         } catch (Exception e) {
@@ -47,11 +46,17 @@ public class MemberController {
     @PostMapping("/login")
     public Result login(@Valid @ModelAttribute LoginForm form) {
         try {
-            String token = memberService.login(form.getUsername(), form.getPassword());
-            return new Result(true, token);
+            Member member = memberService.login(form.getUsername(), form.getPassword());
+            return new Result(true,member );
         } catch (Exception e) {
             return new Result(false,e.getMessage());
         }
+    }
+    @PostMapping("/validate")
+    public Result login(@RequestParam String username){
+        boolean b = memberService.duplicateUsername(username);
+        return new Result(b," 사용가능한 아이디입니다.");
+
     }
     //로그아웃
     @PostMapping("/logout")
