@@ -3,14 +3,12 @@ package capstone.atplace.controller;
 import capstone.atplace.form.CoordinateForm;
 import capstone.atplace.kakaoapi.KakaoLocalAPI;
 import capstone.atplace.response.Result;
+import capstone.atplace.response.Result2;
 import lombok.RequiredArgsConstructor;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +22,7 @@ public class kakaoApiController {
         JSONObject addressinfo = kakaoLocalAPI.getAddressInfoByCoordinate(coordinateForm.getX() + " " + coordinateForm.getY());
         return new Result(true,addressinfo);
     }
-    @GetMapping("/mid-point")
+    @PostMapping("/mid-point")
     public Result midPoint(@RequestParam List<String> x, @RequestParam List<String> y){
         String midPoint = kakaoLocalAPI.findMidPoint(x, y);
         //JSONObject addressInfoByCoordinate = kakaoLocalAPI.getAddressInfoByCoordinate(midPoint);
@@ -37,27 +35,27 @@ public class kakaoApiController {
         coordinate.put("y",b);
         return new Result(true, coordinate);
     }
-    @GetMapping("/addresses")
-    public Result getCoordinateByAddresses(@RequestParam List<String> addresses) {
-        //JSONObject coordinateByAddress = kakaoLocalAPI.getCoordinateByAddress(address);
-        Double sumX = Double.valueOf(0);
-        Double sumY = Double.valueOf(0);
+    @PostMapping("/addresses")
+    public Result2 getCoordinateByAddresses(@RequestParam String place1,@RequestParam String place2) {
 
-        for(String address:addresses) {
-            JSONObject address1 = kakaoLocalAPI.getAddressInfoByAddress(address);
-            JSONArray documents = (JSONArray) address1.get("documents");
-            JSONObject jsonObject = (JSONObject) documents.get(0);
-            String x = (String) jsonObject.get("x");
-            String y = (String) jsonObject.get("y");
-            System.out.println("x = " + x);
-            System.out.println("y = " + y);
-            sumX += Double.parseDouble(x);
-            sumY += Double.parseDouble(y);
-        }
-        HashMap<String,Double> coordinate = new HashMap<>();
-        coordinate.put("x",sumX/addresses.size());
-        coordinate.put("y",sumY/addresses.size());
-        return new Result(true,coordinate );
+        JSONObject address1 = kakaoLocalAPI.getAddressInfoByAddress(place1);
+        JSONObject address2 = kakaoLocalAPI.getAddressInfoByAddress(place2);
+
+        JSONArray documents1 = (JSONArray) address1.get("documents");
+        JSONObject jsonObject1 = (JSONObject) documents1.get(0);
+        Double place1X = Double.parseDouble((String) jsonObject1.get("x"));
+        Double place1Y = Double.parseDouble((String) jsonObject1.get("y"));
+
+        JSONArray documents2 = (JSONArray) address2.get("documents");
+        JSONObject jsonObject2 = (JSONObject) documents2.get(0);
+        Double place2X = Double.parseDouble((String) jsonObject2.get("x"));
+        Double place2Y = Double.parseDouble((String) jsonObject2.get("y"));
+
+        Double  x= (place1X+place2X)/2;
+        Double  y= (place1Y+place2Y)/2;
+
+        JSONObject address = kakaoLocalAPI.getAddressInfoByCoordinate(x + " " + y);
+        return new Result2(true,x,y,place1X,place1Y,place2X,place2Y,address);
     }
     @GetMapping("/searching")
     public Result getPlacesBySearching(@RequestParam String keyword){
