@@ -36,7 +36,7 @@ public class MemberController {
         Member member = new Member(form.getUsername(), form.getPassword(), form.getName());
         try {
             memberService.join(member);
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
             return new Result(false,e.getMessage());
         }
         return new Result(true, member);
@@ -54,7 +54,11 @@ public class MemberController {
     }
     @PostMapping("/validate")
     public Result login(@RequestParam String username){
-        boolean b = memberService.duplicateUsername(username);
+        boolean b;
+        try{b= memberService.duplicateUsername(username);}
+        catch(Exception e){
+            return new Result(false," 중복아이디");
+        };
         return new Result(b," 사용가능한 아이디입니다.");
 
     }
